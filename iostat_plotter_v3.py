@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Enhanced data plotter for iostat output. Feb. 22 2014
 #
@@ -51,7 +52,11 @@
 # please send back changes.
 #
 
+import datetime as dt
+import dateutil.parser
+import locale
 import sys
+
 try:
    import shlex                      # Needed for splitting input lines
 except ImportError:
@@ -92,7 +97,7 @@ except ImportError:
    print "Continuing to process";
    pickle_success = 0;
 
-
+ 
 # ------------------------------
 
 
@@ -1995,6 +2000,18 @@ if __name__ == '__main__':
          combined_plots = 1;
       elif (item == "-h"):
          help_flag = 1;
+      elif (item == "-l"):
+         # obey user's preferred locale settings (environment vars)
+         # for parsing iostat data (LC_NUMERIC, LC_TIME)
+         locale.setlocale(locale.LC_ALL,'')
+         # btw. making this default would make things worse (#regression)
+         # example: parsing LC_ALL=C data with a LC_NUMERIC=de_DE.UTF-8
+         # >>> locale.setlocale(locale.LC_ALL,'de_DE.UTF-8')
+         # 'de_DE.UTF-8'
+         # >>> locale.atof("1,2")
+         # 1.2
+         # >>> locale.atof("1.2")
+         # 12.0
       # end if
    # end for
    input_filename = input_options[-1];
@@ -2018,7 +2035,6 @@ if __name__ == '__main__':
    idle_list = [];
    date_list = [];
    time_list = [];
-   meridian_list = [];
    
    # Initialize variables
    fsize = 8;
@@ -2088,31 +2104,31 @@ if __name__ == '__main__':
                   if (item["device"] == local_device):
                      #print "         adding data to existing device: ";
                      if (vflag == 9):
-                        device_data_list[iloop]["rrqm"].append(float(currentline[1]));
-                        device_data_list[iloop]["wrqm"].append(float(currentline[2]));
-                        device_data_list[iloop]["r"].append(float(currentline[3]));
-                        device_data_list[iloop]["w"].append(float(currentline[4]));
-                        device_data_list[iloop]["rMB"].append(float(currentline[5]));
-                        device_data_list[iloop]["wMB"].append(float(currentline[6]));
-                        device_data_list[iloop]["avgrqsz"].append(float(currentline[7]));
-                        device_data_list[iloop]["avgqusz"].append(float(currentline[8]));
-                        device_data_list[iloop]["await"].append(float(currentline[9]));
-                        device_data_list[iloop]["svctm"].append(float(currentline[10]));
-                        device_data_list[iloop]["util"].append(float(currentline[11])); 
+                        device_data_list[iloop]["rrqm"].append(locale.atof(currentline[1]));
+                        device_data_list[iloop]["wrqm"].append(locale.atof(currentline[2]));
+                        device_data_list[iloop]["r"].append(locale.atof(currentline[3]));
+                        device_data_list[iloop]["w"].append(locale.atof(currentline[4]));
+                        device_data_list[iloop]["rMB"].append(locale.atof(currentline[5]));
+                        device_data_list[iloop]["wMB"].append(locale.atof(currentline[6]));
+                        device_data_list[iloop]["avgrqsz"].append(locale.atof(currentline[7]));
+                        device_data_list[iloop]["avgqusz"].append(locale.atof(currentline[8]));
+                        device_data_list[iloop]["await"].append(locale.atof(currentline[9]));
+                        device_data_list[iloop]["svctm"].append(locale.atof(currentline[10]));
+                        device_data_list[iloop]["util"].append(locale.atof(currentline[11])); 
                      elif (vflag == 10):
-                        device_data_list[iloop]["rrqm"].append(float(currentline[1]));
-                        device_data_list[iloop]["wrqm"].append(float(currentline[2]));
-                        device_data_list[iloop]["r"].append(float(currentline[3]));
-                        device_data_list[iloop]["w"].append(float(currentline[4]));
-                        device_data_list[iloop]["rMB"].append(float(currentline[5]));
-                        device_data_list[iloop]["wMB"].append(float(currentline[6]));
-                        device_data_list[iloop]["avgrqsz"].append(float(currentline[7]));
-                        device_data_list[iloop]["avgqusz"].append(float(currentline[8]));
-                        device_data_list[iloop]["await"].append(float(currentline[9]));
-                        device_data_list[iloop]["r_await"].append(float(currentline[10]));
-                        device_data_list[iloop]["w_await"].append(float(currentline[11]));
-                        device_data_list[iloop]["svctm"].append(float(currentline[12]));
-                        device_data_list[iloop]["util"].append(float(currentline[13]));
+                        device_data_list[iloop]["rrqm"].append(locale.atof(currentline[1]));
+                        device_data_list[iloop]["wrqm"].append(locale.atof(currentline[2]));
+                        device_data_list[iloop]["r"].append(locale.atof(currentline[3]));
+                        device_data_list[iloop]["w"].append(locale.atof(currentline[4]));
+                        device_data_list[iloop]["rMB"].append(locale.atof(currentline[5]));
+                        device_data_list[iloop]["wMB"].append(locale.atof(currentline[6]));
+                        device_data_list[iloop]["avgrqsz"].append(locale.atof(currentline[7]));
+                        device_data_list[iloop]["avgqusz"].append(locale.atof(currentline[8]));
+                        device_data_list[iloop]["await"].append(locale.atof(currentline[9]));
+                        device_data_list[iloop]["r_await"].append(locale.atof(currentline[10]));
+                        device_data_list[iloop]["w_await"].append(locale.atof(currentline[11]));
+                        device_data_list[iloop]["svctm"].append(locale.atof(currentline[12]));
+                        device_data_list[iloop]["util"].append(locale.atof(currentline[13]));
                      #end if           
                      ifind = 1;
                   # end if
@@ -2138,34 +2154,34 @@ if __name__ == '__main__':
                   local_dict = {};
                   if (vflag == 9):
                      local_dict["device"] = local_device;
-                     local_dict["rrqm"]=[float(currentline[1])];
-                     local_dict["wrqm"]=[float(currentline[2])];
-                     local_dict["r"]=[float(currentline[3])]; 
-                     local_dict["w"]=[float(currentline[4])];
-                     local_dict["rMB"]=[float(currentline[5])];
-                     local_dict["wMB"]=[float(currentline[6])];
-                     local_dict["avgrqsz"]=[float(currentline[7])];
-                     local_dict["avgqusz"]=[float(currentline[8])];
-                     local_dict["await"]=[float(currentline[9])];
-                     local_dict["svctm"]=[float(currentline[10])];
-                     local_dict["util"]=[float(currentline[11])];
+                     local_dict["rrqm"]=[locale.atof(currentline[1])];
+                     local_dict["wrqm"]=[locale.atof(currentline[2])];
+                     local_dict["r"]=[locale.atof(currentline[3])]; 
+                     local_dict["w"]=[locale.atof(currentline[4])];
+                     local_dict["rMB"]=[locale.atof(currentline[5])];
+                     local_dict["wMB"]=[locale.atof(currentline[6])];
+                     local_dict["avgrqsz"]=[locale.atof(currentline[7])];
+                     local_dict["avgqusz"]=[locale.atof(currentline[8])];
+                     local_dict["await"]=[locale.atof(currentline[9])];
+                     local_dict["svctm"]=[locale.atof(currentline[10])];
+                     local_dict["util"]=[locale.atof(currentline[11])];
                      #print "      local_dict = ",local_dict
                      device_data_list.append(local_dict);
                   elif (vflag == 10):
                      local_dict["device"] = local_device;
-                     local_dict["rrqm"]=[float(currentline[1])];
-                     local_dict["wrqm"]=[float(currentline[2])];
-                     local_dict["r"]=[float(currentline[3])]; 
-                     local_dict["w"]=[float(currentline[4])];
-                     local_dict["rMB"]=[float(currentline[5])];
-                     local_dict["wMB"]=[float(currentline[6])];
-                     local_dict["avgrqsz"]=[float(currentline[7])];
-                     local_dict["avgqusz"]=[float(currentline[8])];
-                     local_dict["await"]=[float(currentline[9])];
-                     local_dict["r_await"]=[float(currentline[10])];
-                     local_dict["w_await"]=[float(currentline[11])];
-                     local_dict["svctm"]=[float(currentline[12])];
-                     local_dict["util"]=[float(currentline[13])];
+                     local_dict["rrqm"]=[locale.atof(currentline[1])];
+                     local_dict["wrqm"]=[locale.atof(currentline[2])];
+                     local_dict["r"]=[locale.atof(currentline[3])]; 
+                     local_dict["w"]=[locale.atof(currentline[4])];
+                     local_dict["rMB"]=[locale.atof(currentline[5])];
+                     local_dict["wMB"]=[locale.atof(currentline[6])];
+                     local_dict["avgrqsz"]=[locale.atof(currentline[7])];
+                     local_dict["avgqusz"]=[locale.atof(currentline[8])];
+                     local_dict["await"]=[locale.atof(currentline[9])];
+                     local_dict["r_await"]=[locale.atof(currentline[10])];
+                     local_dict["w_await"]=[locale.atof(currentline[11])];
+                     local_dict["svctm"]=[locale.atof(currentline[12])];
+                     local_dict["util"]=[locale.atof(currentline[13])];
                      #print "      local_dict = ",local_dict
                      device_data_list.append(local_dict);
                   # end if
@@ -2191,33 +2207,33 @@ if __name__ == '__main__':
                local_dict = {};
                if (vflag == 9):
                   local_dict["device"] = local_device;
-                  local_dict["rrqm"]=[float(currentline[1])];
-                  local_dict["wrqm"]=[float(currentline[2])];
-                  local_dict["r"]=[float(currentline[3])]; 
-                  local_dict["w"]=[float(currentline[4])];
-                  local_dict["rMB"]=[float(currentline[5])];
-                  local_dict["wMB"]=[float(currentline[6])];
-                  local_dict["avgrqsz"]=[float(currentline[7])];
-                  local_dict["avgqusz"]=[float(currentline[8])];
-                  local_dict["await"]=[float(currentline[9])];
-                  local_dict["svctm"]=[float(currentline[10])];
-                  local_dict["util"]=[float(currentline[11])];
+                  local_dict["rrqm"]=[locale.atof(currentline[1])];
+                  local_dict["wrqm"]=[locale.atof(currentline[2])];
+                  local_dict["r"]=[locale.atof(currentline[3])]; 
+                  local_dict["w"]=[locale.atof(currentline[4])];
+                  local_dict["rMB"]=[locale.atof(currentline[5])];
+                  local_dict["wMB"]=[locale.atof(currentline[6])];
+                  local_dict["avgrqsz"]=[locale.atof(currentline[7])];
+                  local_dict["avgqusz"]=[locale.atof(currentline[8])];
+                  local_dict["await"]=[locale.atof(currentline[9])];
+                  local_dict["svctm"]=[locale.atof(currentline[10])];
+                  local_dict["util"]=[locale.atof(currentline[11])];
                   device_data_list.append(local_dict);
                elif (vflag == 10):
                   local_dict["device"] = local_device;
-                  local_dict["rrqm"]=[float(currentline[1])];
-                  local_dict["wrqm"]=[float(currentline[2])];
-                  local_dict["r"]=[float(currentline[3])]; 
-                  local_dict["w"]=[float(currentline[4])];
-                  local_dict["rMB"]=[float(currentline[5])];
-                  local_dict["wMB"]=[float(currentline[6])];
-                  local_dict["avgrqsz"]=[float(currentline[7])];
-                  local_dict["avgqusz"]=[float(currentline[8])];
-                  local_dict["await"]=[float(currentline[9])];
-                  local_dict["r_await"]=[float(currentline[10])];
-                  local_dict["w_await"]=[float(currentline[11])];
-                  local_dict["svctm"]=[float(currentline[12])];
-                  local_dict["util"]=[float(currentline[13])];
+                  local_dict["rrqm"]=[locale.atof(currentline[1])];
+                  local_dict["wrqm"]=[locale.atof(currentline[2])];
+                  local_dict["r"]=[locale.atof(currentline[3])]; 
+                  local_dict["w"]=[locale.atof(currentline[4])];
+                  local_dict["rMB"]=[locale.atof(currentline[5])];
+                  local_dict["wMB"]=[locale.atof(currentline[6])];
+                  local_dict["avgrqsz"]=[locale.atof(currentline[7])];
+                  local_dict["avgqusz"]=[locale.atof(currentline[8])];
+                  local_dict["await"]=[locale.atof(currentline[9])];
+                  local_dict["r_await"]=[locale.atof(currentline[10])];
+                  local_dict["w_await"]=[locale.atof(currentline[11])];
+                  local_dict["svctm"]=[locale.atof(currentline[12])];
+                  local_dict["util"]=[locale.atof(currentline[13])];
                   device_data_list.append(local_dict);
                # end if
                #print "      local_dict = ",local_dict
@@ -2225,12 +2241,12 @@ if __name__ == '__main__':
                
          elif (cpu_flag == 1):
             #print "   Reading and Storing CPU values";
-            user_list.append(float(currentline[0]));
-            nice_list.append(float(currentline[1]));
-            system_list.append(float(currentline[2]));
-            iowait_list.append(float(currentline[3]));
-            steal_list.append(float(currentline[4]));
-            idle_list.append(float(currentline[5]));
+            user_list.append(locale.atof(currentline[0]));
+            nice_list.append(locale.atof(currentline[1]));
+            system_list.append(locale.atof(currentline[2]));
+            iowait_list.append(locale.atof(currentline[3]));
+            steal_list.append(locale.atof(currentline[4]));
+            idle_list.append(locale.atof(currentline[5]));
             #print "      user_list = ",user_list
             #print "      nice_list = ",nice_list
             #print "      system_list = ",system_list
@@ -2247,24 +2263,14 @@ if __name__ == '__main__':
             #print "      cpu_labels = ",cpu_labels
          elif (time_flag == 1):
             #print "   Read time information";
-            date_list.append(currentline[0].replace("/"," "));
-            # if meridian is PM then need to add 12 hours to time_list
-            if (currentline[2] == "PM"):
-               junk1 = currentline[1].replace(":"," ");
-               junk2 = shlex.split(junk1);
-               if ( int(junk2[0]) < 12):
-                  junk3 = int(junk2[0]) + 12;
-               elif (int(junk2[0]) == 12):
-                  junk3 = int(junk2[0]);
-               # end if
-               junk4 = str(junk3) + ":" + junk2[1] + ":" + junk2[2];
-               time_list.append(junk4);
-            else:
-               time_list.append(currentline[1]);
-            # end if
+            
+            ts = dateutil.parser.parse( ' '.join(currentline) )
+            date_list.append( ts.strftime("%m %d %Y") )
+            time_list.append( ts.strftime("%H:%M:%S") )
+
             #print "      date_list = ",date_list
             #print "      time_list = ",time_list
-            meridian_list.append(currentline[2]);
+
             time_flag = -1;
             cpu_flag = 0;
             icount = icount + 1;
@@ -2381,7 +2387,7 @@ if __name__ == '__main__':
    output_str = output_str + "   <LI>Core Type " + system_info["CPU"] + " \n";
    output_str = output_str + "</UL> \n";
    output_str = output_str + "The iostat run was started on " + system_info["date"] + " at \n";
-   output_str = output_str + time_list[0] + " " + meridian_list[0] + ". \n";
+   output_str = output_str + time_list[0] + ". \n";
    output_str = output_str + "</P> \n";
    f.write(output_str);
    
@@ -2693,7 +2699,6 @@ if __name__ == '__main__':
       time_data = {};
       time_data["date_list"] = date_list;
       time_data["time_list"] = time_list;
-      time_data["meridian_list"] = meridian_list;
       
       # Device data
       #device_data = {};
