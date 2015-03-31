@@ -2672,7 +2672,7 @@ if __name__ == '__main__':
              fsize, item, device_data_list, line_list);
       print "   Finished Plot ",iplot," of ",max_plots;
    # end of
-   print "Finished. Please open the document HTML/report.html in a browser.";
+   print "Finished. Please open the document HTML_REPORT/report.html in a browser.";
    
    # Start of Pickling
    # =================
