@@ -69,6 +69,8 @@ except:
    sys.exit();
 
 try:
+   import matplotlib
+   matplotlib.use('agg')
    import matplotlib.pyplot as plt;   # Needed for plots
    matplotlib_var = 1
 except:
